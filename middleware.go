@@ -18,10 +18,10 @@ func validateToken(validToken string, r *http.Request) bool {
 }
 
 func Middleware(validToken string) func(next http.Handler) http.Handler {
-	return MiddlewareWithText(validToken, "Unauthorized")
+	return MiddlewareTextError(validToken, "Unauthorized")
 }
 
-func MiddlewareWithText(validToken string, text string) func(next http.Handler) http.Handler {
+func MiddlewareTextError(validToken string, text string) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			v := validateToken(validToken, r)
@@ -35,13 +35,14 @@ func MiddlewareWithText(validToken string, text string) func(next http.Handler) 
 	}
 }
 
-func MiddlewareWithJSON(validToken string, json string) func(next http.Handler) http.Handler {
+func MiddlewareJSONError(validToken string, json []byte) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			v := validateToken(validToken, r)
 			if !v {
 				w.Header().Set("Content-Type", "application/json")
-				http.Error(w, json, http.StatusUnauthorized)
+				w.WriteHeader(http.StatusUnauthorized)
+				w.Write(json)
 				return
 			}
 
