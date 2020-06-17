@@ -71,6 +71,6 @@ func TestMiddlewareWithJSON(t *testing.T) {
 	}
 
 	if res.Code != e.Code {
-		t.Errorf("")
+		t.Errorf("Bad error response")
 	}
 }
